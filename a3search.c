@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 //Declaration
+// working for the straight edition
 void Bad_match_table(size_t *a, char * pattern);
 int BMH(char *adds, char * pattern);
 
