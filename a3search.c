@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <time.h>
 
+// Basically use the BM Horspool algorithm
 
 //Declaration
 // working for the straight edition
@@ -20,7 +21,7 @@ typedef struct node {
 typedef struct list {
     Node * head;
 } Dictionary;
-  
+
 Node * CreateNode(int num, char * adds) {
     Node *a;
     a = (Node *)malloc(sizeof(Node));
@@ -56,7 +57,7 @@ void AddNode(Dictionary *p, Node *node) {
 }
 // delete behind node and return next
 
- Node * DeleteNode(Node * front, Node * behind, Dictionary *a) {
+Node * DeleteNode(Node * front, Node * behind, Dictionary *a) {
     if (behind->next == NULL) {
         if(front == NULL) {
             return NULL;
@@ -85,7 +86,7 @@ float BMH(char *adds,const char * pattern) {
     size_t size = strlen(pattern);
 
 
-    for (i = 0; i < 256; i++) {      
+    for (i = 0; i < 256; i++) {
         a[i] = size;
     }
 
@@ -101,46 +102,34 @@ float BMH(char *adds,const char * pattern) {
     char *my_string = NULL;
     int tmp = 0;
     float result = 0;
-    int pos = 0;
-    char tmpchar = ' ';
+
+    int length = strlen(pattern);
     while (1)
     {
         //bit operation
         // my_string = (char *) malloc (nbytes + 1);
         bytes_read = getline (&my_string, &nbytes, fp);
-         if (bytes_read == -1)
+        int pos = 0;
+        if (bytes_read == -1)
         {
             break;
         }
         else
         {
-            pos = size - 1;
-            while(pos < bytes_read ) {
-                // printf("pos:%d\n", pos);
-                tmp = pos;
-                for (i = size - 1; i >= 0; i--)
-                {
-                    if(tolower(pattern[i]) ==  tolower(my_string[pos])) {
-                        pos -= 1;
-                        if(i == 0) {
-                            result += 1;
-                            pos = tmp + 1;
-                            break;
-                        }
-                        continue;
-                    }
-                    else {
-                        // printf("%c %d\n", tolower(my_string[pos]),a[tolower(my_string[pos])]);
-                        pos = tmp + a[tolower(my_string[pos])];
-                        // pos = tmp + a[tmpchar]   ;
-                        // printf("tmp:%d pos1:%d\n",tmp,pos);
+            while ((bytes_read - pos) >= length) {
+                i = length - 1;
+                while (tolower(my_string[pos + i]) == tolower(pattern[i])) {
+                    if (i == 0) {
+                        result += 1;
+                        pos += 1;
                         break;
                     }
+                    i = i - 1;
                 }
+                pos = pos + a[tolower(my_string[pos + length - 1])];
             }
 
         }
-
 
 
     }
@@ -158,13 +147,8 @@ void Bad_match_table(size_t *a, const char * pattern) {
     int i = 0;
     size_t  length = strlen(pattern);
     size_t  value = 0; // to compute the bad match table for BMH
-    for (i = 0; i < length; i++) {
-        value = length - i - 1;
-        if (value == 0) {
-            a[tolower(pattern[i])] = length;
-            continue;
-        }
-        a[tolower(pattern[i])] = value;
+    for (i = 0; i < length - 1; i++) {
+        a[tolower(pattern[i])] = length - i - 1;
     }
 }
 
@@ -249,8 +233,8 @@ int main(int argc, char const *argv[])
     Dictionary *a = CreateList();
 
 // testing code
-//     char adds[] = "/Users/chenyu/simple/file5.txt";
-//    int result = BMH(adds, "apple");
+//    char adds[] = "/Users/chenyu/Desktop/cnm.txt";
+//    int result = BMH(adds, "conclusions");
 //    printf("%d",result);
 
     char *slash = "/";
@@ -279,10 +263,9 @@ int main(int argc, char const *argv[])
                 strcat(adds, slash);
                 strcat(adds, ent->d_name);
                 float result = 0;
-              
+
                 (flag == 1)? (result = BMH(adds, argv[5 + j])):(result=BMH(adds, argv[3 + j]));
-             
-                // printf("%s, %f\n", adds, result);
+
                 if (result == 0) {
                     if (adds)
                     {
@@ -301,7 +284,7 @@ int main(int argc, char const *argv[])
             }
         }
         else {
-            
+
             Node *node = a->head;
             Node *front = NULL;
             //check if the frequency is empty
@@ -316,7 +299,6 @@ int main(int argc, char const *argv[])
 
                 float result = 0;
                 (flag == 1)? (result = BMH(adds, argv[5 + j])):(result=BMH(adds, argv[3 + j]));
-                printf("%s\n", adds);
                 if (result == 0) {
                     a->head = NULL;
                     break;
@@ -327,9 +309,9 @@ int main(int argc, char const *argv[])
                 }
 
             }
-            
+
             while (node->next != NULL) {
-                
+
                 char *adds = (char *) malloc(150);
                 strcpy(adds, argv[1]);
                 strcat(adds, slash);
@@ -378,6 +360,6 @@ int main(int argc, char const *argv[])
         printf("%s\n", node->adds);
     }
 //
-     closedir (dir);
-     return 0;
+    closedir (dir);
+    return 0;
 }
