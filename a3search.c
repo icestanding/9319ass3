@@ -11,6 +11,7 @@
 // working for the straight edition
 void Bad_match_table(size_t *a, const char * pattern);
 float BMH(char *adds,const char * pattern);
+int compare(char *a, char *b);
 
 typedef struct node {
     char *adds;  //remember the name of file
@@ -167,13 +168,44 @@ void InsertionSort(Dictionary *p, Node *node) {
         p->head = node;
         return;
     }
+    if (n->num == node->num) {
+        int k = compare(n->adds, node->adds);
+        if (k == 0) {
+            node->next = n;
+            p->head = node;
+            return;
+        }
+        if (k == 1) {
+            if(n->next!=NULL) {
+                tmp = n;
+                n = n->next;
+            }
+            else {
+                n->next = node;
+                return;
+            }
+        }
+    }
 
     while(n->next != NULL)
     {
-        if (n->num >= node->num )
+        if (n->num > node->num )
         {
             tmp = n;
             n = n->next;
+        }
+        else if (n->num == node->num)
+        {
+            int k = compare(n->adds, node->adds);
+            if (k == 1) {
+                tmp = n;
+                n = n->next;
+            }
+            if (k == 0) {
+                tmp->next = node;
+                node->next = n;
+                return;
+            }
         }
         else {
             tmp->next = node;
@@ -184,6 +216,17 @@ void InsertionSort(Dictionary *p, Node *node) {
     if(n->num < node->num) {
         tmp->next = node;
         node->next = n;
+    }
+    else if (n->num == node->num)
+    {
+        int k = compare(n->adds, node->adds);
+        if (k == 1) {
+            n->next = node;
+        }
+        if (k == 0) {
+            tmp->next = node;
+            node->next = n;
+        }
     }
     else {
         n->next = node;
@@ -211,7 +254,25 @@ void Average(Dictionary *a, Dictionary *b, int num) {
     }
 }
 
-
+// compare two file name, determine the lexical order.
+int compare(char *a, char *b) {
+    int la = strlen(a);
+    int lb = strlen(b);
+    int i = 0;
+    int tmpa = 0;
+    int tmpb = 0;
+    while (tmpa == tmpb) {
+        (i < la)?(tmpa = a[i]):(tmpa = 0);
+        (i < lb)?(tmpa = b[i]):(tmpb = 0);
+        i++;
+    }
+    if(tmpa > tmpb) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
 
 
 
